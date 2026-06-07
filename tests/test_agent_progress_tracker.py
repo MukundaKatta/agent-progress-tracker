@@ -357,6 +357,33 @@ def test_snapshot_to_dict_keys():
     assert "elapsed_ms" in d
 
 
+def test_snapshot_to_dict_current_step_serialised():
+    t = ProgressTracker()
+    t.add_step("a")
+    t.start("a")
+    d = t.snapshot().to_dict()
+    assert isinstance(d["current_step"], dict)
+    assert d["current_step"]["step_id"] == "a"
+    assert d["current_step"]["status"] == "running"
+
+
+def test_snapshot_to_dict_current_step_none():
+    t = ProgressTracker()
+    t.add_step("a")
+    d = t.snapshot().to_dict()
+    assert d["current_step"] is None
+
+
+def test_snapshot_repr():
+    t = ProgressTracker()
+    t.add_step("a")
+    t.add_step("b")
+    t.complete("a")
+    r = repr(t.snapshot())
+    assert "ProgressSnapshot" in r
+    assert "1/2" in r
+
+
 def test_repr():
     t = ProgressTracker()
     t.add_step("a")
